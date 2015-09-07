@@ -7,20 +7,15 @@ import binascii
 import sys
 
 def prime_factors(n):
-    primfac = []
     d = 2
-    a = 1
-    while d*d <= n:
+    while n > 1:
+        a = 0
         while (n % d) == 0:
-            factortuple = "("+str(d)+", "+str(a)+")"
-            n //= d
             a += 1
-        primfac.append(factortuple)
+            n /= d
+        if a > 0:
+            yield (d, a)
         d += 1
-        a = 1
-    if n > 1:
-       primfac.append("("+str(n)+", 1)")
-    return primfac
 
 def get_divisors(n):
     factors = list(prime_factors(n))
@@ -46,15 +41,15 @@ def convolve(a, b, n):
         convolvesum = convolvesum + int(a[int(div)]) * int(b[int(n / div)])
     return convolvesum
 
-def stage1(bin):
-    binlen = len(bin)
+def stage1(binrep):
+    binlen = len(binrep)
     sumlist = []
     if binlen % 2 == 0:
-        a = bin[0:int(binlen/2)]
-        b = bin[int(binlen/2 + 1):int(binlen)]
+        a = binrep[0:int(binlen/2)]
+        b = binrep[int(binlen/2 + 1):int(binlen)]
     else:
-        a = bin[0:int(binlen/2 - 0.5)]
-        b = bin[int(binlen/2 - 0.5):int(binlen - 1)]
+        a = binrep[0:int(binlen/2 - 0.5)]
+        b = binrep[int(binlen/2 - 0.5):int(binlen - 1)]
     print a
     print b
     for z in range(1, binlen):
@@ -65,41 +60,8 @@ def stage1(bin):
 def stage2(sumlist):
     hashstring = []
     for i in sumlist:
-        v = i % 16
-        if v == 0:
-            hashstring.append("g")
-        if v == 1:
-            hashstring.append("1")
-        if v == 2:
-            hashstring.append("2")
-        if v == 3:
-            hashstring.append("3")
-        if v == 4:
-            hashstring.append("4")
-        if v == 5:
-            hashstring.append("5")
-        if v == 6:
-            hashstring.append("6")
-        if v == 7:
-            hashstring.append("7")
-        if v == 8:
-            hashstring.append("8")
-        if v == 9:
-            hashstring.append("9")
-        if v == 10:
-            hashstring.append("a")
-        if v == 11:
-            hashstring.append("b")
-        if v == 12:
-            hashstring.append("c")
-        if v == 13:
-            hashstring.append("d")
-        if v == 14:
-            hashstring.append("e")
-        if v == 15:
-            hashstring.append("f")
-    ''.join(hashstring)
-    return hashstring
+        hashstring.append(hex(i % 16)[2:])
+    return ''.join(hashstring)
 
 def stage3(hashstring):
     while len(hashstring) >= 32:
