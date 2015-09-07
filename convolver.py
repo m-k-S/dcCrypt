@@ -35,26 +35,29 @@ def get_divisors(n):
 
 # Convolves for ordered tuples given two functions with unrestricted domains
 def convolve(a, b, n):
-    divisorlist = get_divisors(n)
+    divisorlist = []
+    for i in get_divisors(n):
+        divisorlist.append(i)
     convolvesum = 0
     for div in divisorlist:
-        convolvesum = convolvesum + int(a[int(div)]) * int(b[int(n / div)])
+        convolvesum = convolvesum + int(a[int(div) - 1]) * int(b[int(n / div) - 1])
     return convolvesum
+
+    # f star g (6) = f(1)g(6) + f(2)g(3) + f(3)g(2) + f(6)g(1)
 
 def stage1(binrep):
     binlen = len(binrep)
     sumlist = []
     if binlen % 2 == 0:
         a = binrep[0:int(binlen/2)]
-        b = binrep[int(binlen/2 + 1):int(binlen)]
+        b = binrep[int(binlen/2):int(binlen)]
     else:
         a = binrep[0:int(binlen/2 - 0.5)]
-        b = binrep[int(binlen/2 - 0.5):int(binlen - 1)]
-    print a
-    print b
-    for z in range(1, binlen):
+        b = binrep[int(binlen/2 + 0.5):int(binlen - 2)]
+    for z in range(2, binlen/4):
         summed = convolve(a, b, z)
         sumlist.append(summed)
+    print sumlist
     return sumlist
 
 def stage2(sumlist):
@@ -69,19 +72,20 @@ def stage3(hashstring):
             stage1(hashstring)
         else:
             while len(hashstring) % 32 != 0:
-                hashstring + "0"
+                hashstring = hashstring + "0"
             stage1(hashstring)
     return hashstring
 
 def init():
     f = open(os.getcwd() + "\\" + sys.argv[1], "rb")
-    binpro = []
+    size = os.path.getsize(os.getcwd() + "\\" + sys.argv[1])
+    binlist = []
     with f:
-        for g in range(1,sys.getsizeof(f)):
-            byte = f.read(g)
-            hexrep = binascii.hexlify(byte)
-            decrep = int(hexrep, 16)
-            binpro.append(decrep)
-    return binpro
+        byte = [f.read(1) for g in range(size)]
+        for i in byte:
+            binlist.append(ord(i))
+    return binlist
 
 print stage3(stage2(stage1(init())))
+#print convolve([12,112,453,34,45,23],[32,24,360,65,56,23],6)
+#print stage1(init())
