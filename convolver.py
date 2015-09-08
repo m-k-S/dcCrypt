@@ -1,5 +1,8 @@
-# @m-k-S
+#
+# dcCrypt - @m-k-S
+# Updated 9/8/2015 at 10:42 AM GMT
 # Experimental Dirichlet convolution based encryption method
+#
 
 import time
 import os
@@ -33,7 +36,7 @@ def get_divisors(n):
                 if i >= nfactors:
                     return
 
-# Convolves for ordered tuples given two functions with unrestricted domains
+# Convolves for ordered tuples given two functions with sufficient domains
 def convolve(a, b, n):
     divisorlist = []
     for i in get_divisors(n):
@@ -43,7 +46,6 @@ def convolve(a, b, n):
         convolvesum = convolvesum + int(a[int(div) - 1]) * int(b[int(n / div) - 1])
     return convolvesum
 
-    # f star g (6) = f(1)g(6) + f(2)g(3) + f(3)g(2) + f(6)g(1)
 
 def stage1(binrep):
     binlen = len(binrep)
@@ -57,28 +59,28 @@ def stage1(binrep):
     for z in range(2, binlen/4):
         summed = convolve(a, b, z)
         sumlist.append(summed)
-    print sumlist
     return sumlist
 
 def stage2(sumlist):
     hashstring = []
     for i in sumlist:
         hashstring.append(hex(i % 16)[2:])
-    return ''.join(hashstring)
-
-def stage3(hashstring):
-    while len(hashstring) >= 32:
-        if len(hashstring) % 32 == 0:
-            stage1(hashstring)
-        else:
-            while len(hashstring) % 32 != 0:
-                hashstring = hashstring + "0"
-            stage1(hashstring)
     return hashstring
 
+def stage3(hashstring):
+    stringlen = len(hashstring)
+    fixedhash = []
+    for i in range(1,33):
+        fixedhash.append(hashstring[i * (stringlen / 32)])
+    return ''.join(fixedhash)
+
 def init():
-    f = open(os.getcwd() + "\\" + sys.argv[1], "rb")
-    size = os.path.getsize(os.getcwd() + "\\" + sys.argv[1])
+    try:
+        f = open(os.getcwd() + "\\" + sys.argv[1], "rb")
+        size = os.path.getsize(os.getcwd() + "\\" + sys.argv[1])
+    except IOError, e:
+        print "Error: %s." % e
+        exit("Exiting hasher.")
     binlist = []
     with f:
         byte = [f.read(1) for g in range(size)]
@@ -86,6 +88,7 @@ def init():
             binlist.append(ord(i))
     return binlist
 
-print stage3(stage2(stage1(init())))
-#print convolve([12,112,453,34,45,23],[32,24,360,65,56,23],6)
-#print stage1(init())
+if __name__ == "__main__":
+    encrypttime = time.time()
+    print stage3(stage2(stage1(init())))
+    print "Algorithm finished in " + str(time.time() - encrypttime) + " seconds."
