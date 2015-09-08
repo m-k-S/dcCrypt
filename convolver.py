@@ -70,8 +70,8 @@ def stage2(sumlist):
 def stage3(hashstring):
     stringlen = len(hashstring)
     fixedhash = []
-    for i in range(1,33):
-        fixedhash.append(hashstring[i * (stringlen / 32)])
+    for i in range(1,49):
+        fixedhash.append(hashstring[i * (stringlen / 48)])
     return ''.join(fixedhash)
 
 def init():
