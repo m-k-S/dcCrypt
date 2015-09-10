@@ -76,16 +76,26 @@ def stage3(hashstring):
 
 def init():
     try:
-        f = open(os.getcwd() + "\\" + sys.argv[1], "rb")
-        size = os.path.getsize(os.getcwd() + "\\" + sys.argv[1])
+        if sys.platform == "win32" or sys.platform == "cygwin":
+            f = open(os.getcwd() + "\\" + sys.argv[1], "rb")
+            size = os.path.getsize(os.getcwd() + "\\" + sys.argv[1])
+        else:
+            f = open(os.getcwd() + "/" + sys.argv[1], "rb")
+            size = os.path.getsize(os.getcwd() + "/" + sys.argv[1])
     except IOError, e:
         print "Error: %s." % e
         exit("Exiting hasher.")
+    if size < 48:
+        print "File too small for proper convolution."
+        exit("Exiting hasher.")
     binlist = []
     with f:
-        byte = [f.read(1) for g in range(size)]
+        byte = [f.read(1) for g in range(size - 2)]
         for i in byte:
-            binlist.append(ord(i))
+            if ord(i) == 13:
+                pass
+            else:
+                binlist.append(ord(i))
     return binlist
 
 if __name__ == "__main__":
