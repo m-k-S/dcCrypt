@@ -5,4 +5,4 @@ Outputs a 48 byte hash.
 
 USAGE:
 
-python convolver.py \<file in same directory\>
+python convolver.py \<path to file\>
